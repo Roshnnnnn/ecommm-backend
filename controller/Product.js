@@ -1,13 +1,11 @@
 const { Product } = require("../model/Product");
 
-exports.createProduct = (req, res) => {
-	const product = new Product(req.body);
-	product.save((err, doc) => {
-		console.log({ err, doc });
-		if (err) {
-			res.status(400).json(err);
-		} else {
-			res.status(201).json(doc);
-		}
-	});
+exports.createProduct = async (req, res) => {
+	try {
+		const product = new Product(req.body);
+		const savedProduct = await product.save();
+		res.status(201).json(savedProduct);
+	} catch (err) {
+		res.status(400).json({ error: err.message });
+	}
 };
