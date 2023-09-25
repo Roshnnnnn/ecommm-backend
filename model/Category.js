@@ -10,6 +10,7 @@ const virtual = categorySchema.virtual("id");
 virtual.get(function () {
 	return this._id;
 });
+
 categorySchema.set("toJSON", {
 	virtuals: true,
 	versionKey: false,
