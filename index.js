@@ -5,6 +5,7 @@ const mongoose = require("mongoose");
 const productsRouter = require("./routes/Products");
 const categoriesRouter = require("./routes/Categories");
 const brandsRouter = require("./routes/Brands");
+const cors = require("cors");
 
 //middleWare
 
@@ -12,6 +13,12 @@ server.use(express.json());
 server.use("/products", productsRouter.router);
 server.use("/categories", categoriesRouter.router);
 server.use("/brands", brandsRouter.router);
+
+server.use(
+	cors({
+		exposedHeaders: ["X-Total-Count"],
+	})
+);
 
 main().catch((err) => console.log(err));
 

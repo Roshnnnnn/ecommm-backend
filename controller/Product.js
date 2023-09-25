@@ -65,9 +65,9 @@ exports.updateProduct = async (req, res) => {
 		const product = await Product.findByIdAndUpdate(id, req.body, {
 			new: true,
 		});
-		product.discountPrice = Math.round(
-			product.price * (1 - product.discountPercentage / 100)
-		);
+		// product.discountPrice = Math.round(
+		// 	product.price * (1 - product.discountPercentage / 100)
+		// );
 		const updatedProduct = await product.save();
 		res.status(200).json(updatedProduct);
 	} catch (err) {
