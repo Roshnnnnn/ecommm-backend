@@ -8,8 +8,8 @@ const userSchema = new Schema(
 		role: { type: String, required: true, default: "user" },
 		addresses: { type: [Schema.Types.Mixed] },
 		name: { type: String },
-		salt: Buffer,
-		resetPasswordToken: { type: String, default: "" },
+		// salt: Buffer,
+		// resetPasswordToken: { type: String, default: "" },
 	},
 	{ timestamps: true }
 );
