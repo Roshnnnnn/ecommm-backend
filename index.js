@@ -178,7 +178,10 @@ passport.deserializeUser(function (user, cb) {
 // Payments
 
 // This is your test secret API key.
-const stripe = require("stripe")(process.env.STRIPE_SERVER_KEY);
+const stripe = require("stripe")(
+	"sk_test_51LS5KhSA2eW7tOKazMVxLw6gFWyOzVGx9e6jjgCyP9UTMn9f3DjN8Anz2KAZkc9sZyzW0m5AGWeZ4tgDwNwFIeyx00n2Y1KGBm"
+);
+// (process.env.STRIPE_SERVER_KEY);
 
 server.post("/create-payment-intent", async (req, res) => {
 	const { totalAmount, orderId } = req.body;
