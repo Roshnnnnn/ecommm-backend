@@ -154,7 +154,7 @@ server.post("/create-payment-intent", async (req, res) => {
 // TODO: we will capture actual order after deploying out server live on public URL
 
 const endpointSecret =
-	"whsec_0e1456a83b60b01b3133d4dbe06afa98f384c2837645c364ee0d5382f6fa3ca2";
+	"whsec_ce8473cfb70859aa0b1d30bae200637ddee8fa76140410154c55467c58fd43d6";
 
 server.post(
 	"/webhook",
