@@ -1,3 +1,4 @@
+require("dotenv").config();
 const express = require("express");
 const server = express();
 const mongoose = require("mongoose");
@@ -190,10 +191,10 @@ server.post(
 main().catch((err) => console.log(err));
 
 async function main() {
-	await mongoose.connect("mongodb://127.0.0.1:27017/ecommerce");
+	await mongoose.connect("mongodb://localhost:27017/ecommm");
 	console.log("database connected");
 }
 
-server.listen(8080, () => {
+server.listen(process.env.PORT, () => {
 	console.log("server started");
 });
