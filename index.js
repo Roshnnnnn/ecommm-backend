@@ -155,7 +155,6 @@ server.post("/create-payment-intent", async (req, res) => {
 
 const endpointSecret =
 	"whsec_ce8473cfb70859aa0b1d30bae200637ddee8fa76140410154c55467c58fd43d6";
-
 server.post(
 	"/webhook",
 	express.raw({ type: "application/json" }),
