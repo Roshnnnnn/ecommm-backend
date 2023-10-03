@@ -22,12 +22,11 @@ const ordersRouter = require("./routes/Order");
 const { User } = require("./model/User");
 const { isAuth, sanitizeUser, cookieExtractor } = require("./services/common");
 
-const SECRET_KEY = "SECRET_KEY";
 // JWT options
 
 const opts = {};
 opts.jwtFromRequest = cookieExtractor;
-opts.secretOrKey = SECRET_KEY; // TODO: should not be in code;
+opts.secretOrKey = process.env.JWT_SECRET_KEY; // TODO: should not be in code;
 
 //middlewares
 
@@ -35,7 +34,7 @@ server.use(express.static("build"));
 server.use(cookieParser());
 server.use(
 	session({
-		secret: "keyboard cat",
+		secret: process.env.SESSION_KEY,
 		resave: false, // don't save session if unmodified
 		saveUninitialized: false, // don't create session until something stored
 	})
@@ -82,8 +81,11 @@ passport.use(
 					if (!crypto.timingSafeEqual(user.password, hashedPassword)) {
 						return done(null, false, { message: "invalid credentials" });
 					}
-					const token = jwt.sign(sanitizeUser(user), SECRET_KEY);
-					done(null, { id: user.id, role: user.role }); // this lines sends to serializer
+					const token = jwt.sign(
+						sanitizeUser(user),
+						process.env.JWT_SECRET_KEY
+					);
+					done(null, { id: user.id, role: user.role, token }); // this lines sends to serializer
 				}
 			);
 		} catch (err) {
@@ -108,7 +110,6 @@ passport.use(
 		}
 	})
 );
-
 // this creates session variable req.user on being called from callbacks
 passport.serializeUser(function (user, cb) {
 	console.log("serialize", user);
