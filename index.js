@@ -129,9 +129,7 @@ passport.deserializeUser(function (user, cb) {
 // Payments
 
 // This is your test secret API key.
-const stripe = require("stripe")(
-	"sk_test_51N5NLVSF2Mo4AGVvozBmb6d5td4kq0lexk43naVyOdmdzLoO4g8LLDsCFc7pT08pUjBesL0G95eP8Xv95kbOaRgU00qrTMpPnY"
-);
+const stripe = require("stripe")(process.env.STRIPE_SERVER_KEY);
 
 server.post("/create-payment-intent", async (req, res) => {
 	const { totalAmount } = req.body;
@@ -154,8 +152,7 @@ server.post("/create-payment-intent", async (req, res) => {
 
 // TODO: we will capture actual order after deploying out server live on public URL
 
-const endpointSecret =
-	"whsec_ce8473cfb70859aa0b1d30bae200637ddee8fa76140410154c55467c58fd43d6";
+const endpointSecret = process.env.ENDPOINT_SECRET;
 server.post(
 	"/webhook",
 	express.raw({ type: "application/json" }),
@@ -191,7 +188,7 @@ server.post(
 main().catch((err) => console.log(err));
 
 async function main() {
-	await mongoose.connect("mongodb://localhost:27017/ecommm");
+	await mongoose.connect(MONGODB_URL);
 	console.log("database connected");
 }
 
