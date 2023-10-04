@@ -2,6 +2,7 @@ require("dotenv").config();
 const express = require("express");
 const server = express();
 const mongoose = require("mongoose");
+const { createProduct } = require("./controller/Product");
 // const cors = require("cors");
 // const session = require("express-session");
 // const passport = require("passport");
@@ -47,7 +48,7 @@ const mongoose = require("mongoose");
 // 	})
 // );
 // server.use(express.raw({ type: "application/json" }));
-// server.use(express.json()); // to parse req.body
+server.use(express.json()); // to parse req.body
 // server.use("/products", isAuth(), productsRouter.router);
 // // we can also use JWT token for client-only auth
 // server.use("/categories", isAuth(), categoriesRouter.router);
@@ -188,10 +189,12 @@ const mongoose = require("mongoose");
 // 	}
 // );
 
+server.post("/products", createProduct);
+
 main().catch((err) => console.log(err));
 
 async function main() {
-	await mongoose.connect("mongodb://localhost:27017/test");
+	await mongoose.connect("mongodb://127.0.0.1:27017/ecommerce");
 	console.log("database connected");
 }
 
