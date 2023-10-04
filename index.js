@@ -22,11 +22,12 @@ const ordersRouter = require("./routes/Order");
 const { User } = require("./model/User");
 const { isAuth, sanitizeUser, cookieExtractor } = require("./services/common");
 
+const SECRET_KEY = "SECRET_KEY";
 // JWT options
 
 const opts = {};
 opts.jwtFromRequest = cookieExtractor;
-opts.secretOrKey = process.env.JWT_SECRET_KEY; // TODO: should not be in code;
+opts.secretOrKey = SECRET_KEY; // TODO: should not be in code;
 
 //middlewares
 
@@ -34,7 +35,7 @@ server.use(express.static("build"));
 server.use(cookieParser());
 server.use(
 	session({
-		secret: process.env.SESSION_KEY,
+		secret: "keyboard cat",
 		resave: false, // don't save session if unmodified
 		saveUninitialized: false, // don't create session until something stored
 	})
@@ -81,11 +82,8 @@ passport.use(
 					if (!crypto.timingSafeEqual(user.password, hashedPassword)) {
 						return done(null, false, { message: "invalid credentials" });
 					}
-					const token = jwt.sign(
-						sanitizeUser(user),
-						process.env.JWT_SECRET_KEY
-					);
-					done(null, { id: user.id, role: user.role, token }); // this lines sends to serializer
+					const token = jwt.sign(sanitizeUser(user), SECRET_KEY);
+					done(null, { id: user.id, role: user.role }); // this lines sends to serializer
 				}
 			);
 		} catch (err) {
@@ -110,6 +108,7 @@ passport.use(
 		}
 	})
 );
+
 // this creates session variable req.user on being called from callbacks
 passport.serializeUser(function (user, cb) {
 	console.log("serialize", user);
@@ -130,7 +129,9 @@ passport.deserializeUser(function (user, cb) {
 // Payments
 
 // This is your test secret API key.
-const stripe = require("stripe")(process.env.STRIPE_SERVER_KEY);
+const stripe = require("stripe")(
+	"sk_test_51N5NLVSF2Mo4AGVvozBmb6d5td4kq0lexk43naVyOdmdzLoO4g8LLDsCFc7pT08pUjBesL0G95eP8Xv95kbOaRgU00qrTMpPnY"
+);
 
 server.post("/create-payment-intent", async (req, res) => {
 	const { totalAmount } = req.body;
@@ -153,7 +154,8 @@ server.post("/create-payment-intent", async (req, res) => {
 
 // TODO: we will capture actual order after deploying out server live on public URL
 
-const endpointSecret = process.env.ENDPOINT_SECRET;
+const endpointSecret =
+	"whsec_ce8473cfb70859aa0b1d30bae200637ddee8fa76140410154c55467c58fd43d6";
 server.post(
 	"/webhook",
 	express.raw({ type: "application/json" }),
@@ -189,7 +191,7 @@ server.post(
 main().catch((err) => console.log(err));
 
 async function main() {
-	await mongoose.connect(MONGODB_URL);
+	await mongoose.connect("mongodb://localhost:27017/ecommm");
 	console.log("database connected");
 }
 
