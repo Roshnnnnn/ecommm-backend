@@ -32,6 +32,7 @@ const LocalStrategy = require("passport-local").Strategy;
 
 // //middlewares
 
+server.use(express.json()); // to parse req.body
 // server.use(express.static("build"));
 // server.use(cookieParser());
 // server.use(
@@ -48,7 +49,6 @@ const LocalStrategy = require("passport-local").Strategy;
 // 	})
 // );
 // server.use(express.raw({ type: "application/json" }));
-server.use(express.json()); // to parse req.body
 // server.use("/products", isAuth(), productsRouter.router);
 // // we can also use JWT token for client-only auth
 // server.use("/categories", isAuth(), categoriesRouter.router);
@@ -188,6 +188,10 @@ server.use(express.json()); // to parse req.body
 // 		response.send();
 // 	}
 // );
+
+server.get("/", (req, res) => {
+	res.json({ status: "success" });
+});
 
 server.post("/products", createProduct);
 
