@@ -13,7 +13,7 @@ const LocalStrategy = require("passport-local").Strategy;
 // const ExtractJwt = require("passport-jwt").ExtractJwt;
 // const cookieParser = require("cookie-parser");
 // const { createProduct } = require("./controller/Product");
-// const productsRouter = require("./routes/Products");
+const productsRouter = require("./routes/Products");
 // const categoriesRouter = require("./routes/Categories");
 // const brandsRouter = require("./routes/Brands");
 // const usersRouter = require("./routes/Users");
@@ -33,6 +33,7 @@ const LocalStrategy = require("passport-local").Strategy;
 // //middlewares
 
 server.use(express.json()); // to parse req.body
+server.use("/products", productsRouter.router);
 // server.use(express.static("build"));
 // server.use(cookieParser());
 // server.use(
@@ -192,8 +193,6 @@ server.use(express.json()); // to parse req.body
 server.get("/", (req, res) => {
 	res.json({ status: "success" });
 });
-
-server.post("/products", createProduct);
 
 main().catch((err) => console.log(err));
 
