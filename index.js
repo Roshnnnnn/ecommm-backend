@@ -14,8 +14,8 @@ const LocalStrategy = require("passport-local").Strategy;
 // const cookieParser = require("cookie-parser");
 // const { createProduct } = require("./controller/Product");
 const productsRouter = require("./routes/Products");
-// const categoriesRouter = require("./routes/Categories");
-// const brandsRouter = require("./routes/Brands");
+const categoriesRouter = require("./routes/Categories");
+const brandsRouter = require("./routes/Brands");
 // const usersRouter = require("./routes/Users");
 // const authRouter = require("./routes/Auth");
 // const cartRouter = require("./routes/Cart");
@@ -34,6 +34,8 @@ const productsRouter = require("./routes/Products");
 
 server.use(express.json()); // to parse req.body
 server.use("/products", productsRouter.router);
+server.use("/categories", categoriesRouter.router);
+server.use("/brands", brandsRouter.router);
 // server.use(express.static("build"));
 // server.use(cookieParser());
 // server.use(
