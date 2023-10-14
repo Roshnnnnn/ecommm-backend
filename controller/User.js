@@ -1,4 +1,3 @@
-const { Category } = require("../model/Category");
 const { User } = require("../model/User");
 
 exports.fetchUserById = async (req, res) => {
@@ -6,14 +5,7 @@ exports.fetchUserById = async (req, res) => {
 	console.log(id);
 	try {
 		const user = await User.findById(id);
-		res.status(200).json(
-			// id: user.id,
-			// addresses: user.addresses,
-			// email: user.email,
-			// role: user.role,
-			id,
-			"name email id"
-		);
+		res.status(200).json(id, "name email id");
 	} catch (err) {
 		res.status(400).json(err);
 	}
