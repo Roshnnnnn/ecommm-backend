@@ -15,7 +15,8 @@ exports.addToCart = async (req, res) => {
 	const { id } = req.params;
 	try {
 		const doc = await Cart.findByIdAndDelete();
-		res.status(201).json(doc);
+		const result = await doc.populate("product");
+		res.status(201).json(result);
 	} catch (err) {
 		res.status(400).json(err);
 	}
