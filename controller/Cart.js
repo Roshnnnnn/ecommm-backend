@@ -23,12 +23,10 @@ exports.addToCart = async (req, res) => {
 };
 
 exports.deleteFromCart = async (req, res) => {
-	const cart = new Cart(req.body);
+	const { id } = req.params;
 	try {
-		const doc = await cart.save();
-		const result = await doc.populate("product");
-
-		res.status(201).json(result);
+		const doc = await Cart.findByIdAndDelete(id);
+		res.status(200).json(doc);
 	} catch (err) {
 		res.status(400).json(err);
 	}
