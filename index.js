@@ -4,7 +4,7 @@ const mongoose = require("mongoose");
 const cors = require("cors");
 const session = require("express-session");
 const passport = require("passport");
-const SQLiteStore = require("connect-sqlite3")(session);
+// const SQLiteStore = require("connect-sqlite3")(session);
 const LocalStrategy = require("passport-local").Strategy;
 const productsRouter = require("./routes/Products");
 const categoriesRouter = require("./routes/Categories");
@@ -25,7 +25,7 @@ passport.use(
 			console.log({ user });
 			if (!user) {
 				done(null, false, { message: "invalid credentials" });
-			} else if (user.password === req.body.password) {
+			} else if (user.password === password) {
 				done(null, user);
 			} else {
 				done(null, false, { message: "invalid credentials" });
@@ -59,7 +59,7 @@ server.use(
 		secret: "keyboard cat",
 		resave: false,
 		saveUninitialized: false,
-		store: new SQLiteStore({ db: "sessions.db", dir: "./var/db" }),
+		// store: new SQLiteStore({ db: "sessions.db", dir: "./var/db" }),
 	})
 );
 server.use(passport.authenticate("session"));

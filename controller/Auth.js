@@ -28,5 +28,9 @@ exports.loginUser = async (req, res) => {
 	// } catch (err) {
 	//   res.status(400).json(err);
 	// }
-	res.json({ status: "success" });
+	res.json(req.user);
+};
+
+exports.checkUser = async (req, res) => {
+	res.json();
 };
