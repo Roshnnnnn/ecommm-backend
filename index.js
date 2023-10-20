@@ -4,6 +4,8 @@ const mongoose = require("mongoose");
 const cors = require("cors");
 const session = require("express-session");
 const passport = require("passport");
+const SQLiteStore = require("connect-sqlite3")(session);
+const LocalStrategy = require("passport-local").Strategy;
 const productsRouter = require("./routes/Products");
 const categoriesRouter = require("./routes/Categories");
 const brandsRouter = require("./routes/Brands");
@@ -15,9 +17,22 @@ const ordersRouter = require("./routes/Order");
 //passport strategies
 
 passport.use(
-	new LocalStrategy(function (username, password, done) {
+	new LocalStrategy(async function (username, password, done) {
 		// by default passport uses username
-		User.findOne({ email: username });
+		try {
+			const user = await User.findOne({ email: username }).exec();
+			// TODO: this is just temporary, we will use strong password auth
+			console.log({ user });
+			if (!user) {
+				done(null, false, { message: "invalid credentials" });
+			} else if (user.password === req.body.password) {
+				done(null, user);
+			} else {
+				done(null, false, { message: "invalid credentials" });
+			}
+		} catch (err) {
+			done(err);
+		}
 	})
 );
 
@@ -25,11 +40,7 @@ passport.use(
 
 passport.serializeUser(function (user, cb) {
 	process.nextTick(function () {
-		return cb(null, {
-			id: user.id,
-			username: user.username,
-			picture: user.picture,
-		});
+		return cb(null, { id: user.id, role: user.role });
 	});
 });
 
