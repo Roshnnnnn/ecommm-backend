@@ -4,7 +4,7 @@ const mongoose = require("mongoose");
 const cors = require("cors");
 const session = require("express-session");
 const passport = require("passport");
-// const SQLiteStore = require("connect-sqlite3")(session);
+
 const LocalStrategy = require("passport-local").Strategy;
 const productsRouter = require("./routes/Products");
 const categoriesRouter = require("./routes/Categories");
@@ -73,7 +73,7 @@ server.use(
 	})
 );
 server.use(express.json()); // to parse req.body
-server.use("/products", productsRouter.router);
+server.use("/products", isAuth, productsRouter.router);
 server.use("/categories", categoriesRouter.router);
 server.use("/brands", brandsRouter.router);
 server.use("/users", usersRouter.router);
@@ -91,6 +91,14 @@ async function main() {
 server.get("/", (req, res) => {
 	res.json({ status: "success" });
 });
+
+function isAuth(req, res, done) {
+	if (req.user) {
+		done();
+	} else {
+		res.send(401);
+	}
+}
 
 server.listen(8080, () => {
 	console.log("server started");
