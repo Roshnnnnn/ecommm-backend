@@ -5,6 +5,7 @@ const cors = require("cors");
 const session = require("express-session");
 const passport = require("passport");
 const crypto = require("crypto");
+const jwt = require("jsonwebtoken");
 const JwtStrategy = require("passport-jwt").Strategy;
 const ExtractJwt = require("passport-jwt").ExtractJwt;
 
@@ -18,12 +19,15 @@ const cartRouter = require("./routes/Cart");
 const ordersRouter = require("./routes/Order");
 const { User } = require("./model/User");
 const { isAuth, sanitizeUser } = require("./services/common");
+const SECRET_KEY = "SECRET_KEY";
+
+// const token = jwt.sign({ foo: "bar" }, SECRET_KEY);
 
 // JWT options
 
 const opts = {};
 opts.jwtFromRequest = ExtractJwt.fromAuthHeaderAsBearerToken();
-opts.secretOrKey = "SECRET_KEY";
+opts.secretOrKey = SECRET_KEY;
 
 //passport strategies
 
@@ -46,7 +50,9 @@ passport.use(
 					if (!crypto.timingSafeEqual(user.password, hashedpassword)) {
 						done(null, false, { message: "invalid credentials" });
 					}
-					done(null, user);
+
+					const token = jwt.sign(sanitizeUser(user), SECRET_KEY);
+					done(null, token);
 				}
 			);
 		} catch (err) {
@@ -67,7 +73,6 @@ passport.use(
 				return done(null, user);
 			} else {
 				return done(null, false);
-				// or you could create a new account
 			}
 		});
 	})
