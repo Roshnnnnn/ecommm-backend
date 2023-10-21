@@ -14,6 +14,8 @@ const authRouter = require("./routes/Auth");
 const cartRouter = require("./routes/Cart");
 const ordersRouter = require("./routes/Order");
 const { User } = require("./model/User");
+const crypto = require("crypto");
+const { isAuth, sanitizeUser } = require("./services/common");
 
 //passport strategies
 
@@ -22,15 +24,23 @@ passport.use(
 	new LocalStrategy(async function (username, password, done) {
 		// by default passport uses username
 		try {
-			const user = await User.findOne({ email: username });
-			console.log(username, password, user);
+			const user = await User.findOne({ email: username }).exec();
 			if (!user) {
 				return done(null, false, { message: "invalid credentials" }); // for safety
-			} else if (user.password === password) {
-				done(null, user);
-			} else {
-				done(null, false, { message: "invalid credentials" });
 			}
+			crypto.pbkdf2(
+				password,
+				user.salt,
+				310000,
+				32,
+				"sha256",
+				async function (err, hashedpassword) {
+					if (!crypto.timingSafeEqual(user.password, hashedpassword)) {
+						done(null, false, { message: "invalid credentials" });
+					}
+					done(null, user);
+				}
+			);
 		} catch (err) {
 			done(err);
 		}
@@ -42,7 +52,7 @@ passport.use(
 passport.serializeUser(function (user, cb) {
 	console.log("serialize", user);
 	process.nextTick(function () {
-		return cb(null, { id: user.id, role: user.role });
+		return cb(null, sanitizeUser(user));
 	});
 });
 
@@ -86,18 +96,6 @@ main().catch((err) => console.log(err));
 async function main() {
 	await mongoose.connect("mongodb://127.0.0.1:27017/ecommerce");
 	console.log("database connected");
-}
-
-server.get("/", (req, res) => {
-	res.json({ status: "success" });
-});
-
-function isAuth(req, res, done) {
-	if (req.user) {
-		done();
-	} else {
-		res.send(401);
-	}
 }
 
 server.listen(8080, () => {
