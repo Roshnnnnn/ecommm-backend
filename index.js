@@ -33,10 +33,14 @@ opts.secretOrKey = SECRET_KEY;
 
 passport.use(
 	"local",
-	new LocalStrategy(async function (username, password, done) {
+	new LocalStrategy({ usernameField: "email" }, async function (
+		email,
+		password,
+		done
+	) {
 		// by default passport uses username
 		try {
-			const user = await User.findOne({ email: username }).exec();
+			const user = await User.findOne({ email: email }).exec();
 			if (!user) {
 				return done(null, false, { message: "invalid credentials" }); // for safety
 			}
@@ -115,13 +119,13 @@ server.use(
 	})
 );
 server.use(express.json()); // to parse req.body
-server.use("/products", isAuth, productsRouter.router);
-server.use("/categories", categoriesRouter.router);
-server.use("/brands", brandsRouter.router);
-server.use("/users", usersRouter.router);
+server.use("/products", isAuth(), productsRouter.router);
+server.use("/categories", isAuth(), categoriesRouter.router);
+server.use("/brands", isAuth(), brandsRouter.router);
+server.use("/users", isAuth(), usersRouter.router);
 server.use("/auth", authRouter.router);
-server.use("/cart", cartRouter.router);
-server.use("/orders", ordersRouter.router);
+server.use("/cart", isAuth(), cartRouter.router);
+server.use("/orders", isAuth(), ordersRouter.router);
 
 main().catch((err) => console.log(err));
 
