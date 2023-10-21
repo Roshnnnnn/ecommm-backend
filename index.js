@@ -63,18 +63,19 @@ passport.use(
 
 passport.use(
 	"jwt",
-	new JwtStrategy(opts, function (jwt_payload, done) {
+	new JwtStrategy(opts, async function (jwt_payload, done) {
 		console.log({ jwt_payload });
-		User.findOne({ id: jwt_payload.sub }, function (err, user) {
-			if (err) {
-				return done(err, false);
-			}
+
+		try {
+			const user = await User.findOne({ id: jwt_payload.sub });
 			if (user) {
 				return done(null, user);
 			} else {
 				return done(null, false);
 			}
-		});
+		} catch (err) {
+			return done(err, false);
+		}
 	})
 );
 

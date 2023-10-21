@@ -23,7 +23,7 @@ exports.createUser = async (req, res) => {
 						res.status(201).json();
 					} else {
 						const token = jwt.sign(sanitizeUser(doc), SECRET_KEY);
-						res.status(400).json(doc);
+						res.status(400).json(token);
 					}
 				});
 			}
@@ -38,5 +38,5 @@ exports.loginUser = async (req, res) => {
 };
 
 exports.checkUser = async (req, res) => {
-	res.json();
+	res.json({ status: "success", user: req.user });
 };
