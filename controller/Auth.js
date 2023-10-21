@@ -15,7 +15,14 @@ exports.createUser = async (req, res) => {
 			async function (err, hashedpassword) {
 				const user = new User({ ...req.body, password: hashedpassword, salt });
 				const doc = await user.save();
-				res.status(201).json(sanitizeUser(doc));
+
+				req.login(sanitizeUser(doc), (err) => {
+					if (err) {
+						res.status(201).json();
+					} else {
+						res.status(400).json(sanitizeUser(doc));
+					}
+				});
 			}
 		);
 	} catch (err) {
