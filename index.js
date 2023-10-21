@@ -4,6 +4,9 @@ const mongoose = require("mongoose");
 const cors = require("cors");
 const session = require("express-session");
 const passport = require("passport");
+const crypto = require("crypto");
+const JwtStrategy = require("passport-jwt").Strategy;
+const ExtractJwt = require("passport-jwt").ExtractJwt;
 
 const LocalStrategy = require("passport-local").Strategy;
 const productsRouter = require("./routes/Products");
@@ -14,8 +17,13 @@ const authRouter = require("./routes/Auth");
 const cartRouter = require("./routes/Cart");
 const ordersRouter = require("./routes/Order");
 const { User } = require("./model/User");
-const crypto = require("crypto");
 const { isAuth, sanitizeUser } = require("./services/common");
+
+// JWT options
+
+const opts = {};
+opts.jwtFromRequest = ExtractJwt.fromAuthHeaderAsBearerToken();
+opts.secretOrKey = "SECRET_KEY";
 
 //passport strategies
 
@@ -44,6 +52,23 @@ passport.use(
 		} catch (err) {
 			done(err);
 		}
+	})
+);
+
+passport.use(
+	"jwt",
+	new JwtStrategy(opts, function (jwt_payload, done) {
+		User.findOne({ id: jwt_payload.sub }, function (err, user) {
+			if (err) {
+				return done(err, false);
+			}
+			if (user) {
+				return done(null, user);
+			} else {
+				return done(null, false);
+				// or you could create a new account
+			}
+		});
 	})
 );
 
