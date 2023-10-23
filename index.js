@@ -8,7 +8,7 @@ const crypto = require("crypto");
 const jwt = require("jsonwebtoken");
 const JwtStrategy = require("passport-jwt").Strategy;
 const ExtractJwt = require("passport-jwt").ExtractJwt;
-
+const cookieParser = require("cookie-parser");
 const LocalStrategy = require("passport-local").Strategy;
 const productsRouter = require("./routes/Products");
 const categoriesRouter = require("./routes/Categories");
@@ -18,7 +18,7 @@ const authRouter = require("./routes/Auth");
 const cartRouter = require("./routes/Cart");
 const ordersRouter = require("./routes/Order");
 const { User } = require("./model/User");
-const { isAuth, sanitizeUser } = require("./services/common");
+const { isAuth, sanitizeUser, cookieExtractor } = require("./services/common");
 const SECRET_KEY = "SECRET_KEY";
 
 // const token = jwt.sign({ foo: "bar" }, SECRET_KEY);
@@ -26,7 +26,7 @@ const SECRET_KEY = "SECRET_KEY";
 // JWT options
 
 const opts = {};
-opts.jwtFromRequest = ExtractJwt.fromAuthHeaderAsBearerToken();
+opts.jwtFromRequest = cookieExtractor;
 opts.secretOrKey = SECRET_KEY;
 
 //passport strategies
@@ -56,7 +56,7 @@ passport.use(
 					}
 
 					const token = jwt.sign(sanitizeUser(user), SECRET_KEY);
-					done(null, token);
+					done(null, { token });
 				}
 			);
 		} catch (err) {
@@ -104,6 +104,8 @@ passport.deserializeUser(function (user, cb) {
 
 //middlewares
 
+server.use(express.static("build"));
+server.use(cookieParser());
 server.use(
 	session({
 		secret: "keyboard cat",
