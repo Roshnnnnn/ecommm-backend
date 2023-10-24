@@ -71,7 +71,7 @@ passport.use(
 		console.log({ jwt_payload });
 
 		try {
-			const user = await User.findOne({ id: jwt_payload.sub });
+			const user = await User.findById(jwt_payload);
 			if (user) {
 				return done(null, sanitizeUser(user));
 			} else {
