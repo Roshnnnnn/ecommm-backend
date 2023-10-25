@@ -46,6 +46,7 @@ server.use(
 		exposedHeaders: ["X-Total-Count"],
 	})
 );
+server.use(express.raw({ type: "application/json" }));
 server.use(express.json()); // to parse req.body
 server.use("/products", isAuth(), productsRouter.router);
 // we can also use JWT token for client-only auth
