@@ -1,3 +1,4 @@
+require("dotenv").config();
 const express = require("express");
 const server = express();
 const mongoose = require("mongoose");
@@ -22,12 +23,11 @@ const { User } = require("./model/User");
 const { isAuth, sanitizeUser, cookieExtractor } = require("./services/common");
 const { appendFile } = require("fs");
 
-const SECRET_KEY = "SECRET_KEY";
 // JWT options
 
 const opts = {};
 opts.jwtFromRequest = cookieExtractor;
-opts.secretOrKey = SECRET_KEY; // TODO: should not be in code;
+opts.secretOrKey = process.env.JWT_SECRET_KEY; // TODO: should not be in code;
 
 //middlewares
 
@@ -35,7 +35,7 @@ server.use(express.static("build"));
 server.use(cookieParser());
 server.use(
 	session({
-		secret: "keyboard cat",
+		secret: process.env.SESSION_KEY,
 		resave: false, // don't save session if unmodified
 		saveUninitialized: false, // don't create session until something stored
 	})
@@ -128,19 +128,17 @@ passport.deserializeUser(function (user, cb) {
 
 // Payments
 
-const stripe = require("stripe")(
-	"sk_test_51LS5KhSA2eW7tOKazMVxLw6gFWyOzVGx9e6jjgCyP9UTMn9f3DjN8Anz2KAZkc9sZyzW0m5AGWeZ4tgDwNwFIeyx00n2Y1KGBm"
-);
+const stripe = require("stripe")(process.env.STRIPE_SERVER_KEY);
 
-const calculateOrderAmount = (items) => {
-	return 1400;
-};
+// const calculateOrderAmount = (items) => {
+// 	return 1400;
+// };
 
-server.post("/cretae-payment-intent", async (req, res) => {
-	const { items } = req.body;
+server.post("/create-payment-intent", async (req, res) => {
+	const { totalAmount } = req.body;
 
 	const paymentIntent = await stripe.paymentIntents.create({
-		amount: calculateOrderAmount(items),
+		amount: totalAmount * 100,
 		currency: "inr",
 		automatic_payment_methods: {
 			enabled: true,
@@ -152,15 +150,46 @@ server.post("/cretae-payment-intent", async (req, res) => {
 	});
 });
 
-// app.listen(4242, () => console.log("Node server listening on port 4242"));
+//webhooks
+
+const endpointSecret = process.env.ENDPOINT_SECRET;
+
+server.post(
+	"/webhook",
+	express.raw({ type: "application/json" }),
+	(request, response) => {
+		const sig = request.headers["stripe-signature"];
+
+		let event;
+
+		try {
+			event = stripe.webhooks.constructEvent(request.body, sig, endpointSecret);
+		} catch (err) {
+			response.status(400).send(`Webhook Error: ${err.message}`);
+			return;
+		}
+
+		// Handle the event
+		switch (event.type) {
+			case "payment_intent.succeeded":
+				const paymentIntentSucceeded = event.data.object;
+				console.log({ paymentIntentSucceeded });
+				break;
+			default:
+				console.log(`Unhandled event type ${event.type}`);
+		}
+
+		response.send();
+	}
+);
 
 main().catch((err) => console.log(err));
 
 async function main() {
-	await mongoose.connect("mongodb://127.0.0.1:27017/ecommerce");
+	await mongoose.connect(process.env.MONGODB_URL);
 	console.log("database connected");
 }
 
-server.listen(8080, () => {
+server.listen(process.env.PORT, () => {
 	console.log("server started");
 });
