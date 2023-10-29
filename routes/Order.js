@@ -1,17 +1,19 @@
 const express = require("express");
 const {
-	createProduct,
-	fetchAllProducts,
-	fetchProductById,
-	updateProduct,
-} = require("../controller/Product");
+	createOrder,
+	fetchOrdersByUser,
+	deleteOrder,
+	updateOrder,
+	fetchAllOrders,
+} = require("../controller/Order");
 
 const router = express.Router();
-//  /products is already added in base path
+//  /orders is already added in base path
 router
-	.post("/", createProduct)
-	.get("/", fetchAllProducts)
-	.get("/:id", fetchProductById)
-	.patch("/:id", updateProduct);
+	.post("/", createOrder)
+	.get("/own/", fetchOrdersByUser)
+	.delete("/:id", deleteOrder)
+	.patch("/:id", updateOrder)
+	.get("/", fetchAllOrders);
 
 exports.router = router;
